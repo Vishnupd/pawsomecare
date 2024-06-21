@@ -1,0 +1,271 @@
+Enum "user_role" {
+  "USER"
+  "ADMIN"
+  "ADMIN1"
+}
+
+Enum "gender" {
+  "MALE"
+  "FEMALE"
+  "OTHERS"
+}
+
+Table "category" {
+  "id" integer [pk, increment]
+  "name" varchar(30)
+  "is_active" bool
+}
+
+Table "users" {
+  "id" integer [pk, increment]
+  "firstname" varchar(30)
+  "lastname" varchar(30)
+  "dob" timestamp
+  "annual_income" float
+  "username" varchar(30)
+  "email" varchar(30) [unique, not null]
+  "created_at" timestamp
+  "password" varchar(100)
+  "contact" varchar(12)
+  "address" varchar(1000)
+  "role" user_role
+  "is_active" bool
+  "updated_on" timestamp
+}
+
+Table "veterinarian" {
+  "id" integer [pk, increment]
+  "name" varchar(30)
+  "email" varchar(30)
+  "contact_no" varchar(12)
+  "is_active" bool
+  "consult_fee" float
+}
+
+Table "clinic" {
+  "id" integer [pk, increment]
+  "name" varchar
+  "description" varchar(2000)
+  "address" varchar(1000)
+  "specialities" varchar(1000)
+}
+
+Table "appointment" {
+  "id" integer [pk, increment]
+  "appt_time" timestamp
+  "clinic" integer
+  "vaccine" integer
+  "is_consult" bool
+  "is_vaccine" bool
+  "is_grooming" bool
+  "vaccine_dose" float
+  "vaccine_other" varchar(30)
+  "consult_detail" varchar(1000)
+  "tablet_prescribed" varchar(1000)
+  "next_visit_suggest" timestamp
+  "feedback" integer
+  "appt_by" integer
+  "pet_id" integer
+  "vet_id" integer
+  "reason" varchar(1000)
+  "created_at" timestamp
+  "updated_on" timestamp
+  "amount" float
+}
+
+Table "medicine" {
+  "id" integer [pk, increment]
+  "name" varchar(30)
+  "created_on" timestamp
+  "expires_at" timestamp
+  "per_cost" float
+  "description" varchar(1000)
+  "is_ins_allowed" bool
+}
+
+Table "vaccine" {
+  "id" integer [pk, increment]
+  "name" varchar(30)
+  "description" varchar(200)
+  "amount" float
+  "created_on" timestamp
+  "is_ins_allowed" bool
+}
+
+Table "feedback" {
+  "id" integer [pk, increment]
+  "title" varchar(60)
+  "description" text [note: 'feedback detail']
+  "rate" integer
+  "appointment" integer
+  "created_at" timestamp
+}
+
+Table "pet" {
+  "id" integer [pk, increment, note: 'unique string']
+  "is_adopted" bool
+  "is_licensed" bool
+  "pet_name" varchar(30)
+  "gender" gender
+  "weight" float
+  "age" integer
+  "dob" timestamp
+  "license_id" integer
+  "owner_id" integer
+  "category_id" integer
+  "insurance_id" integer
+  "created_at" timestamp
+  "updated_on" timestamp
+}
+
+Table "ins_pack_name" {
+  "id" integer [pk, increment]
+  "pack_name" varchar(30)
+  "type" varchar(30)
+  "coverage" float
+  "amount" float
+  "validity_in_months" integer
+  "is_active" bool
+  "created_at" timestamp
+  "updated_on" timestamp
+  "description" varchar(2000)
+}
+
+Table "insurance" {
+  "id" varchar(30) [pk, increment]
+  "pack_id" integer
+  "pet_id" integer
+  "created_at" timestamp
+  "updated_on" timestamp
+  "expired_at" timestamp
+  "feedback" integer
+}
+
+Table "insurance_claim" {
+  "claim_id" integer [pk, increment]
+  "insurance_id" varchar(30)
+  "claim_amount" float
+  "appt_id" integer
+  "is_settled" bool
+  "is_canceled" bool
+  "description" bool
+  "feedback" integer
+}
+
+Table "license_form" {
+  "id" integer [pk, increment]
+  "pet_id" integer
+  "owner_id" integer
+  "license_no" varchar(30) [unique]
+  "issued_at" timestamp
+  "expires_on" timestamp
+  "is_active" bool
+  "amount" float
+}
+
+Table "adoption_form" {
+  "id" integer [pk, increment]
+  "pet_id" integer
+  "owner_id" integer
+  "description" varchar(2000)
+  "created_at" timestamp
+  "updated_on" timestamp
+  "approved_by" integer
+}
+
+Table "grooming" {
+  "id" integer [pk, increment]
+  "name" integer
+  "description" integer
+  "cost" float
+  "time_require" timestamp
+  "is_ins_allowed" bool
+}
+
+Table "grooming_appointment" {
+  "grooming_id" integer
+  "appointment_id" integer
+
+  Indexes {
+    (grooming_id, appointment_id) [pk]
+  }
+}
+
+Table "veterinarian_clinic" {
+  "veterinarian_id" integer
+  "clinic_id" integer
+
+  Indexes {
+    (veterinarian_id, clinic_id) [pk]
+  }
+}
+
+Table "appointment_medicine" {
+  "appointment_id" integer
+  "medicine_id" integer
+
+  Indexes {
+    (appointment_id, medicine_id) [pk]
+  }
+}
+
+Table "insurance_feedback" {
+  "insurance_id" varchar(30)
+  "feedback_id" integer
+
+  Indexes {
+    (insurance_id, feedback_id) [pk]
+  }
+}
+
+Ref:"clinic"."id" < "appointment"."clinic"
+
+Ref:"vaccine"."id" < "appointment"."vaccine"
+
+Ref:"feedback"."id" < "appointment"."feedback"
+
+Ref:"users"."id" < "appointment"."appt_by"
+
+Ref:"pet"."id" < "appointment"."pet_id"
+
+Ref:"users"."id" < "pet"."owner_id"
+
+Ref:"pet"."id" < "license_form"."pet_id"
+
+Ref:"ins_pack_name"."id" < "insurance"."pack_id"
+
+Ref:"pet"."id" < "insurance"."pet_id"
+
+Ref:"insurance"."id" < "insurance_claim"."insurance_id"
+
+Ref:"appointment"."id" < "insurance_claim"."appt_id"
+
+Ref:"category"."id" < "pet"."category_id"
+
+Ref:"users"."id" < "license_form"."owner_id"
+
+Ref:"pet"."id" < "adoption_form"."pet_id"
+
+Ref:"users"."id" < "adoption_form"."owner_id"
+
+Ref:"users"."id" < "adoption_form"."approved_by"
+
+Ref:"grooming"."id" < "grooming_appointment"."grooming_id"
+
+Ref:"appointment"."id" < "grooming_appointment"."appointment_id"
+
+Ref:"veterinarian"."id" < "veterinarian_clinic"."veterinarian_id"
+
+Ref:"clinic"."id" < "veterinarian_clinic"."clinic_id"
+
+Ref:"veterinarian"."id" < "appointment"."vet_id"
+
+Ref:"appointment"."id" < "appointment_medicine"."appointment_id"
+
+Ref:"medicine"."id" < "appointment_medicine"."medicine_id"
+
+Ref:"insurance"."id" < "insurance_feedback"."insurance_id"
+
+Ref:"feedback"."id" < "insurance_feedback"."feedback_id"
+
+Ref:"feedback"."id" < "insurance_claim"."feedback"
