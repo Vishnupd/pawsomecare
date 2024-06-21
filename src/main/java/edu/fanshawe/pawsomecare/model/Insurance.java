@@ -6,7 +6,7 @@ import lombok.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.List;
-
+import org.hibernate.annotations.UuidGenerator;
 
 /**
  * The persistent class for the insurance database table.
@@ -23,6 +23,7 @@ public class Insurance implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@UuidGenerator
 	private String id;
 
 	@Column(name="created_at")
