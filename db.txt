@@ -10,7 +10,7 @@ Enum "gender" {
   "OTHERS"
 }
 
-Table "category" {
+Table "petCategory" {
   "id" integer [pk, increment]
   "name" varchar(30)
   "is_active" bool
@@ -240,7 +240,7 @@ Ref:"insurance"."id" < "insurance_claim"."insurance_id"
 
 Ref:"appointment"."id" < "insurance_claim"."appt_id"
 
-Ref:"category"."id" < "pet"."category_id"
+Ref:"petCategory"."id" < "pet"."category_id"
 
 Ref:"users"."id" < "license_form"."owner_id"
 
